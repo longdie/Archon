@@ -14,13 +14,17 @@ When instructions conflict between global and local sources, **local takes prece
 
 - **archon-lean4** — under Claude Code this is installed as the `lean4@archon-local` plugin (live-linked to Archon source), providing slash commands `/archon-lean4:prove`, `/archon-lean4:golf`, `/archon-lean4:doctor`, etc. Under other harnesses the slash-command surface is absent; the underlying skill scripts are still on disk under `.claude/skills/` and can be run directly from the shell.
 
+## Credentials
+
+Never print environment dumps, API keys, authentication files, or secret configuration. For authentication diagnostics, report only the variable name and whether it is set. Do not read unrelated user credentials.
+
 ## Tools
 
 Project tools live in `.claude/tools/` as directly-executable scripts — that path is the same whatever harness you run under. List with `ls .claude/tools/`; run `<path> --help`. MCP servers (Lean LSP, etc.) surface as `mcp__*` tools: under Claude Code they are registered in `.claude/settings.json` / `.mcp.json`; under other harnesses the loop wires the same servers in at launch.
 
 Two always-present scripts:
 
-- **`archon-informal-agent.py`** — call external LLMs for an informal proof-style sketch when you're stuck on an approach and want a second opinion. Supports DeepSeek, Kimi (OpenAI-compatible via `--provider kimi`), Kimi (Anthropic-compatible via `--provider kimi-anthropic`), OpenRouter, OpenAI, and Gemini; defaults to `--provider auto` which picks the best available key automatically. **Requires at least one key in env** (`DEEPSEEK_API_KEY` / `MOONSHOT_API_KEY` / `OPENROUTER_API_KEY` / `OPENAI_API_KEY` / `GEMINI_API_KEY`) — check via `env | grep -E "DEEPSEEK|MOONSHOT|OPENROUTER|OPENAI|GEMINI"` BEFORE planning around its use; if no key is set, fall back to alternatives below. Both `kimi` and `kimi-anthropic` use the same `MOONSHOT_API_KEY`; the latter speaks Moonshot's Anthropic-compatible Messages endpoint and supports `--think`. The output is LLM-generated from training data, NOT source-derived: this tool is **not** a literature retriever. For actual literature lookup consult the auto-injected subagent catalog — when a literature/reference-fetching subagent is enabled it will appear there — or use the `WebSearch` / `WebFetch` tools directly.
+- **`archon-informal-agent.py`** — call external LLMs for an informal proof-style sketch when you're stuck on an approach and want a second opinion. Supports DeepSeek, Kimi (OpenAI-compatible via `--provider kimi`), Kimi (Anthropic-compatible via `--provider kimi-anthropic`), OpenRouter, OpenAI, and Gemini; defaults to `--provider auto` which picks the best available key automatically. **Requires at least one key in env** (`DEEPSEEK_API_KEY` / `MOONSHOT_API_KEY` / `OPENROUTER_API_KEY` / `OPENAI_API_KEY` / `GEMINI_API_KEY`) — check only whether each variable is set (report the variable name and a boolean, never its value) BEFORE planning around its use; if no key is set, fall back to alternatives below. Both `kimi` and `kimi-anthropic` use the same `MOONSHOT_API_KEY`; the latter speaks Moonshot's Anthropic-compatible Messages endpoint and supports `--think`. The output is LLM-generated from training data, NOT source-derived: this tool is **not** a literature retriever. For actual literature lookup consult the auto-injected subagent catalog — when a literature/reference-fetching subagent is enabled it will appear there — or use the `WebSearch` / `WebFetch` tools directly.
 - **`archon-subagent.py`** — the generic subagent dispatcher (one wrapper handles every subagent — see "Subagents" below).
 
 ## Subagents
